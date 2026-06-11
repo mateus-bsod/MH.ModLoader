@@ -10,7 +10,6 @@ tDrawText oDrawText = nullptr;
 tPauseMenuControl oPauseMenuControl = nullptr;
 SafetyHookInline g_PauseMenuHook;
 
-std::vector<MenuItem> customMenu;
 int currentSelection = 0;
 bool customMenuActive = false;
 

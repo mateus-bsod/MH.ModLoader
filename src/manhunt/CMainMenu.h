@@ -25,11 +25,18 @@ extern int& menuState;
 extern int& lastSelectedItem;
 extern int& selectedItemIndex;
 extern int& selectedOption ;
+extern int& menu_mouse_in_area;
+
+
 
 namespace CMainMenu
 {
 	void* __cdecl hkMainMenu();
 	signed int hkPauseMenuHandler();
 	signed int hkMainSubMenuHandler(void* thisPtr);
+
+	void __stdcall SetSelectedMenuItemColor();
+	void __stdcall SetNormalMenuItemColor();
+
 	void InstallHook();
 };

@@ -2,7 +2,7 @@
 #define DEBUG_CONSOLE true
 
 #include "framework.h"
-
+#include "./src/game.sdk.h"
 
 #include "src/manhunt/CPlayer.h"
 #include "src/manhunt/CText.h"
@@ -36,30 +36,42 @@ void InitConsole()
 #endif
 }
 
-typedef void(__thiscall* ttttasmdinasd)(void* text, float x, float y, int alignX, int alignY, int color, int flag);
-ttttasmdinasd sub_5E5980 = (ttttasmdinasd)0x5E5980;
 
-void MeuCallback(int button)
+void Test()
 {
-    if (button == 1)
-        CVisual::GameText("Nao");
-    else
-        CVisual::GameText("Obvio que nao!");
+    DWORD p = *(DWORD*)0x82279C;
+
+    if (!p)
+        return;
+
+    DWORD renderer = *(DWORD*)p;
+
+    if (!renderer)
+        return;
+
+
+    DWORD func = 0x5F6E00;
+
+    __asm
+    {
+        push dword ptr ds : [0x7CE214]
+        push 1
+        push dword ptr ds : [0x7CD23C]
+        push dword ptr ds : [0x7CD54C]
+        push dword ptr ds : [0x7CE144]
+        push dword ptr ds : [0x7CE27C]
+        push dword ptr ds : [0x7CC568]
+        push dword ptr ds : [0x7CE280]
+
+        call func
+        add esp, 20h
+    }
 }
-
-
-void unk_sub(int a1, int a2, int a3, ...)
-{
-    Call<0x850072>(a1, a2, a3);
-}
-
-
 
 DWORD WINAPI KillAllHunters(LPVOID) {
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
 
-    printf("Pressione DELETE para matar todos hunters\n");
 
     while (true) {
         __try
@@ -77,7 +89,21 @@ DWORD WINAPI KillAllHunters(LPVOID) {
             char buffer[256];
             float lineHeight = 0.04f;
             float startY = 0.40f;
-            CVisual::DrawString(L"MATEUS", 0.580000, 0.400000, 1060320051, 0.700000);
+
+
+
+            if (GetAsyncKeyState(VK_DELETE) & 1)
+            {
+                __try
+                {
+                    Test();
+                }
+                __except (MyExceptionFilter(GetExceptionInformation()))
+                {
+                    printf("Exception: %08X\n", GetExceptionCode());
+                }
+            }
+
 
             // Posição
             //sprintf(buffer, "Pos: %.2f %.2f %.2f", pos->x, pos->y, pos->z);
@@ -103,7 +129,7 @@ DWORD WINAPI KillAllHunters(LPVOID) {
         {
             continue;
         }
-        Sleep(1000);
+        Sleep(80);
     }
     return 1;
 }
@@ -113,23 +139,9 @@ DWORD WINAPI MainThread(LPVOID) {
     InitConsole();
     InitHooks();
 
-    /*
-    __try
-    {
-        CVisual::DrawString(
-            L"JOGAR",
-            0.58f,
-            0.40f,
-            0xFF,
-            0.70f
-        );
+    // Dentro do seu MainThread ou onde quiser testar
 
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-		printf("[CRASH] 0x%X", GetErrorMode());
-    }
-    */
+
 
     CreateThread(0, 0, KillAllHunters, 0, 0, 0);
     return 0;

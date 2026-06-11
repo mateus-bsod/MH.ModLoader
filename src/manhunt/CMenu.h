@@ -68,12 +68,7 @@ extern tDrawText oDrawText;
 extern SafetyHookInline g_PauseMenuHook;
 extern SafetyHookInline g_DrawTextHook;
 
-struct MenuItem {
-    std::string name;
-    void (*action)();
-};
 
-extern std::vector<MenuItem> customMenu;
 extern int currentSelection;
 extern bool customMenuActive;
 

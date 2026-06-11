@@ -1,6 +1,7 @@
 // CVisual.cpp
 #include "CVisual.h"
 #include "CInput.h"
+#include "CMainMenu.h"
 
 int& selectedDialog = *reinterpret_cast<int*>(0x7C8774);
 int& InDialogBox = *reinterpret_cast<int*>(0x7C8758);
@@ -15,9 +16,10 @@ int& Btn2Pos = *reinterpret_cast<int*>(0x7C8778);
 
 DialogState g_Dialog = { false, nullptr };
 
+
 namespace CVisual
 {
-    // CVisual.cpp - Adicione estas funções
+    
 
     int LoadTexture(int txd, const char* texture)
     {
@@ -29,26 +31,88 @@ namespace CVisual
         Call<0x5F96F0>(posX, posY, scaleX, scaleY, red, green, blue, alpha, pTexture);
     }
 
-    void DrawMenuItem(wchar_t* text, float x, float y, int a4, float a5, int selected)
+    // ------------------------------------------------------------------------------------------------
+
+    void DrawMenuItem(wchar_t* text, float x, float y, int textScaleX, float textScaleY, int menuID)
     {
-        Call<0x5D55C0>(text, x, y, a4, a5, selected);
+        // a4, v5 -> text scale?
+        Call<0x5D55C0>(text, x, y, textScaleX, textScaleY, menuID);
     }
 
-    /*
-    
-        DrawString(
-            L"JOGAR",
-            0.58f,
-            0.40f,
-            0.70f,
-            0.70f
-        );
-    
-    */
-
-    void DrawString(wchar_t* text, float x, float y, int a4, float a5)
+    void DrawColoredQuad(float x, float y, float width, float height, int r, int g, int b, int a, int unknown)
     {
-        Call<0x5D5B30>(text, x, y, a4, a5);
+        Call<0x5F96F0, float, float, float, float, int, int, int, int, int>(x, y, width, height, r, g, b, a, unknown);
+    }
+
+
+    int GetAspectRatio()
+    {
+        return CallAndReturn<int, 0x5EA2B0>();
+    }
+
+
+    int IsUIActive()
+    {
+        return CallAndReturn<int, 0x5DACB0>();
+    }
+
+    // Variáveis globais
+    int& dword_7C8F80 = *(int*)0x7C8F80;
+    int& dword_7C8FB4 = *(int*)0x7C8FB4;
+    int& dword_7C8FA4 = *(int*)0x7C8FA4;
+    int& dword_7C8FA8 = *(int*)0x7C8FA8;
+    float& mouseX = *(float*)0x7C8FC0;
+    float& mouseY = *(float*)0x7C8FC4;
+    float& flt_7C8730 = *(float*)0x7C8730;
+    float& flt_7C8734 = *(float*)0x7C8734;
+    float& flt_7C9048 = *(float*)0x7C9048;
+    float& paddingDefault = *(float*)0x7C872C;
+    int& bgR = *(int*)0x7C8748;
+    int& bgG = *(int*)0x7C874C;
+    int& bgB = *(int*)0x7C8750;
+    int& bgA = *(int*)0x7C8754;
+
+    void DrawMenuItemEx(wchar_t* text, float x, float y, int fontType, float scale, void (*callback)(),
+        int customR, int customG, int customB, int customA, float customPadding)
+    {
+        int r = customR, g = customG, b = customB, a = customA, menuID;
+
+        if (customR == -1) r = bgR;
+        if (customG == -1) g = bgG;
+        if (customB == -1) b = bgB;
+        if (customA == -1) a = bgA;
+
+        if (GetAspectRatio() == 2 && customR == -1) { r = 22; g = 22; b = 118; a = 164; }
+
+        float padding = (customPadding == -1.0f) ? paddingDefault : customPadding;
+
+        float textW = CText::Text_CalcWidth((const wchar_t*)text, fontType, 2);
+        float textH = CText::GetTextWidth(2, scale);
+
+        if (IsUIActive()) {
+            if (dword_7C8F80) { if (!dword_7C8FB4) dword_7C8FA4++; }
+            else if (!dword_7C8FB4) dword_7C8FA8++;
+
+            if (mouseX > x && x + textW > mouseX && mouseY > y && y + textH > mouseY) {
+                dword_7C8FB4 = 1;
+                menuID = 1;
+            }
+        }
+
+        if (menuID) {
+            DrawColoredQuad(x - padding, y + flt_7C8730, padding * flt_7C9048 + textW, textH + flt_7C8734, r, g, b, a, 0);
+            CMainMenu::SetSelectedMenuItemColor();
+        }
+        else {
+            CMainMenu::SetNormalMenuItemColor();
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------------
+
+    void DrawString(wchar_t* text, float x, float y, int textScaleX, float textScaleY)
+    {
+        Call<0x5D5B30>(text, x, y, textScaleX, textScaleY);
     }
 
     //
@@ -57,6 +121,14 @@ namespace CVisual
     {
         ((void(__cdecl*)(const char*))0x005E5410)(text);
     }
+
+    void GameTextLeft(int line, const char* text)
+    {
+		if (line < 0 || line > 25) return;
+
+		Call<0x5E5480>(line, text);
+    }
+
 
     // --------------------------------------------------------------------------------------------------------------
 
@@ -83,6 +155,8 @@ namespace CVisual
         g_Dialog.waiting = false;
     }
 
+    // --------------------------------------------------------------------------------------------------------------
+
     void ShowDialogBoxEx(void* pMessageText, void* pBtn1, void* pBtn2, tDialogCallback callback, int pBtn1_Column, int pBtn2_Column)
     {
         if (InDialogBox) return;
@@ -104,6 +178,8 @@ namespace CVisual
 
         HideDialogBox();
     }
+
+
 
     // --------------------------------------------------------------------------------------------------------------
 

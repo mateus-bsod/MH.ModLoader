@@ -9,9 +9,15 @@
 #include "manhunt/CInventory.h"
 #include "manhunt/CLoadGameWorld.h"
 #include "manhunt/CMenu.h"
+#include "manhunt/CText.h"
 #include "manhunt/CInput.h"
 #include "manhunt/CMainMenu.h"
+#include "manhunt/CGame.h"
 
+
+
+
+// --------------------------------------------------------------------------------
 
 typedef void(__cdecl* tPrint)(void* logger, const char* text);
 
@@ -22,16 +28,20 @@ void __cdecl hkPrint(void* logger, const char* text)
 {
     if (text)
     {
+        /*
         if (strcmp(text, "OK") == 0)
         {
-			printf("[GAME] Manhunt Mod Loader: OK!\n");
+            ClearConsole();
             return;
         }
-        printf("[GAME] %s\n", text);
+        */
+        printf("[CGame::Log] %s\n", text);
     }
 
     oPrint(logger, text);
 }
+
+// ------------------------------------------------------------------------------------
 
 
 
@@ -47,6 +57,8 @@ void InitHooks()
 
     //
 
+	CGame::InstallHook();
+
     CCollectable::InstallHook();
     CWeapon::InstallHook();
     CPlayer::InstallHook();
@@ -57,4 +69,5 @@ void InitHooks()
     //CLoadGameWorld::InstallHook();
     CVisual::InstallHook();
     CInput::InstallHook();
+    CText::InstallHook();
 }

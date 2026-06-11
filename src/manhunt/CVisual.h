@@ -25,13 +25,29 @@ struct DialogState
 
 extern DialogState g_Dialog;
 
+// ------------------------------
+
+
+
 namespace CVisual
 {
     void GameText(const char* text);
     void GameTextEx(const char* fmt, int estado, int time, int effect, int slot = 0);
 
-    typedef void(__stdcall* tGameTextLeft)(int line, const char* text);
-    static tGameTextLeft GameTextLeft = (tGameTextLeft)0x5E5480;
+    // 0x5E5530 -> PrintInfo, mesma coisa
+    void GameTextLeft(int line, const char* text);
+
+	// Só serve para formatar strings, não exibe nada na tela
+    // typedef unsigned int (*GameTextExFunc)(char* buffer, const char* format, ...);
+    // GameTextExFunc GameTextEx = (GameTextExFunc)0x614C80;
+
+    // Só serve para formatar strings, não exibe nada na tela
+    // typedef unsigned int (*Format_Str)(char* buffer, int len, const char* format, ...);
+    // Format_Str Format_String = (Format_Str)0x614C30;
+
+
+    int GetAspectRatio();
+    int IsUIActive();
 
     // ------------------------------------------------------------------------------------------
 
@@ -48,8 +64,12 @@ namespace CVisual
     // ------------------------------------------------------------------------------------------
 
     void DrawImage(float posX, float posY, float scaleX, float scaleY, int red, int green, int blue, int alpha, int pTexture);
-    void DrawMenuItem(wchar_t* text, float x, float y, int a4, float a5, int selected);
-    void DrawString(wchar_t* text, float x, float y, int a4, float a5);
+    void DrawMenuItem(wchar_t* text, float x, float y, int textScaleX, float textScaleY, int selected);
+    void DrawMenuItemEx(wchar_t* text, float x, float y, int fontType, float scale, int isHovered,
+        int customR, int customG, int customB, int customA, float customPadding);
+    
+    void DrawString(wchar_t* text, float x, float y, int textScaleX, float textScaleY);
+    void DrawColoredQuad(float x, float y, float width, float height, int r, int g, int b, int a, int unknown);
 
     // ---
 

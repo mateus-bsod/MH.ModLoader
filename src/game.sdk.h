@@ -1,3 +1,9 @@
+#pragma once
+#include "../framework.h"
+
+#define EXCEPTION_SDK ( MyExceptionFilter(GetExceptionInformation()) )
+
+
 template <unsigned int address, typename... Args>
 static void Call(Args... args) {
 	reinterpret_cast<void(__cdecl*)(Args...)>(address)(args...);
@@ -17,4 +23,11 @@ template <typename Ret, unsigned int address, typename C, typename... Args>
 static Ret CallMethodAndReturn(C _this, Args... args) {
 	return reinterpret_cast<Ret(__thiscall*)(C, Args...)>(address)(_this, args...);
 }
-#pragma once
+
+// -----------------------------------------------------------
+
+void ClearConsole();
+
+// -----------------------------------------------------------
+
+int MyExceptionFilter(EXCEPTION_POINTERS* ep);

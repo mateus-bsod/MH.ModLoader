@@ -1,6 +1,7 @@
 
 #include "CPlayer.h"
 
+int& Player_State = *reinterpret_cast<int*>(0x7D34F8); // dword_7D34F8
 
 //
 
@@ -45,11 +46,10 @@ namespace CPlayer
 
     PLAYER_STATE GetPlayerState() {
 
-        const int in_game = *reinterpret_cast<float*>(0x7D34F8); // dword_7D34F8
-        switch (in_game) {
-        case 0: return PLAYER_MENU;
-        case 1: return PLAYER_CUTSCENE;
-        case 2: return PLAYER_INGAME;
+        switch (Player_State) {
+            case 0: return PLAYER_MENU;
+            case 1: return PLAYER_CUTSCENE;
+            case 2: return PLAYER_INGAME;
         }
         return PLAYER_INVALID;
     }

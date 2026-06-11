@@ -3,7 +3,7 @@
 #include "../../framework.h"
 #include "../game.sdk.h"
 
-#define POINTER_PLAYER 0x715B9C
+extern int& Player_State;
 
 enum PLAYER_STATE
 { 
